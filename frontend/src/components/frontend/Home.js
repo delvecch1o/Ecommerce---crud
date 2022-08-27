@@ -1,15 +1,15 @@
 import React from "react";
-import Footer from "../../layouts/admin/Footer";
+import Navbar from "../../layouts/frontend/Navbar";
 
 function Home() {
     return(
      <div>
+         <Navbar />
          <h1>Boa noite</h1>
-         <Footer/>
      </div>
       
         
     )
 }
 
-export default Home
+export default Home;

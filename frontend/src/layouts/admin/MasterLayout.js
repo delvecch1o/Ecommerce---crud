@@ -8,7 +8,7 @@ import Navbar from './Navbar';
 import Sidebar from './Sidebar';
 import Footer from './Footer';
 
-import routes from '../../routes/routes'
+import routes from '../../routes/routes';
 
 
 const MasterLayout = () => {
