@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router ,Route, Switch } from 'react-router-dom';
+import { BrowserRouter as Router, Redirect ,Route, Switch } from 'react-router-dom';
 
 import Home from './components/frontend/Home';
 import MasterLayout from './layouts/admin/MasterLayout';
@@ -17,6 +17,12 @@ axios.defaults.headers.post['Accept'] = 'application/json';
 
 axios.defaults.withCredentials = true;
 
+axios.interceptors.request.use(function (config){
+  const token = localStorage.getItem('auth_token');
+  config.headers.Authorization = token ? `Bearer ${token}` : '';
+  return config;
+});
+
 function App() {
   return (
     <div className="App">
@@ -25,9 +31,21 @@ function App() {
         <Switch>
 
           <Route exact path="/" component={Home} />
-          <Route exact path="/login" component={Login} />
-          <Route exact path="/register" component={Register} />
-          <Route path="/admin" name= "Admin" render={(props) => <MasterLayout {...props} /> } />
+
+
+         {/* <Route exact path="/login" component={Login} />
+          <Route exact path="/register" component={Register} /> */}
+
+          <Route path="/login">
+            {localStorage.getItem('auth_token') ? <Redirect to='/' /> : <Login />}
+            <Route path="/admin" name= "Admin" render={(props) => <MasterLayout {...props} /> } />
+          </Route>
+
+          <Route path='/register'>
+            {localStorage.getItem('auth_token') ? <Redirect to='/' /> : <Register />}
+            <Route path="/admin" name= "Admin" render={(props) => <MasterLayout {...props} /> } />
+          </Route>
+
   
         </Switch>
       </Router>
