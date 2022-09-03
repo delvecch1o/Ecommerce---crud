@@ -1,80 +1,71 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import axios from 'axios';
+import React, { useEffect, useState } from 'react';
+import { Link, useHistory } from 'react-router-dom';
 import swal from 'sweetalert';
 
+function EditCategory(props) {
 
-function Category() {
+    const history = useHistory();
+    const [loading, setLoading] = useState(true);
+    const [categoryInput, setCategory] = useState([]);
+    const [error, setError] = useState([]);
+    
 
-    const [categoryInput, setCategory] = useState({
-        slug: '',
-        name: '',
-        descrip: '',
-        status: '',
-        meta_title: '',
-        meta_keyword: '',
-        meta_descrip: '',
-        error_list: [],
+    useEffect(() => {
+        const category_id = props.match.params.id;
+        axios.get(`/api/edit-category/${category_id}`).then(res => {
+            if (res.data.status === 200) {
+                setCategory(res.data.category);
+            } else if (res.data.status === 404) {
+                swal("error", res.data.message, "error");
+                history.push('/admin/view-category')
+            }
 
-    });
+            setLoading(false);
+
+        });
+    }, [props.match.params.id, history]);
 
     const handleInput = (e) => {
         e.persist();
-        setCategory({ ...categoryInput, [e.target.name]: e.target.value })
+        setCategory({ ...categoryInput, [e.target.name]: e.target.value });
     }
 
-    const submitCategory = (e) => {
+    const updateCategory = (e) => {
         e.preventDefault();
 
-        const data = {
-            slug: categoryInput.slug,
-            name: categoryInput.name,
-            description: categoryInput.descrip,
-            status: categoryInput.status,
-            meta_title: categoryInput.meta_title,
-            meta_keyword: categoryInput.meta_keyword,
-            meta_descrip: categoryInput.meta_descrip,
-        }
-
-        axios.post('/api/store-category', data).then(res => {
+        const category_id = props.match.params.id;
+        const data = categoryInput;
+        axios.put(`/api/update-category/${category_id}`, data).then(res => {
             if (res.data.status === 200) {
-                e.target.reset();
-                swal("Success", res.data.message, "success");
-                // document.getElementById('CATEGORY_FORM').reset();
+                swal("Success", res.data.message, "success")
+                setError([]);
+            }
+            else if(res.data.status === 422){
+                swal("All fields aew mandetory", "", "error");
+                setError(res.data.errors);
+            }
+            else if(res.data.status === 404){
 
-
-            } else if (res.data.status === 400) {
-
-                setCategory({ ...categoryInput, error_list: res.data.errors });
+                swal("Error", res.data.message, "error")
+                history.push('admin/view-category')
 
             }
 
         });
     }
 
-    var display_errors = [];
-    if (categoryInput.error_list) {
-        display_errors = [
-            categoryInput.error_list.slug,
-            categoryInput.error_list.name,
-            categoryInput.error_list.meta_title,
-        ]
+    if (loading) {
+        return <h4>Loading Edit Category...</h4>
     }
 
-
     return (
-
-        <div className="container-fluid px-4">
-            {
-                display_errors.map((item) => {
-                    return (<p className='mb-1' key={item}>{item}</p>)
-                })
-            }
+        <div className='container px-4'>
 
             <div className="card mt-4">
                 <div className='card-header'>
-                    <h4> Add Category
-                        <Link to='/admin/view-category' className='btn btn-primary btn-sm float-end'>View Category</Link>
+                    <h4> Edit Category
+                        <Link to='/admin/view-category' className='btn btn-primary btn-sm float-end'>BACK</Link>
 
                     </h4>
                 </div>
@@ -82,7 +73,7 @@ function Category() {
 
                 <div className='card-body'>
 
-                    <form onSubmit={submitCategory} id="CATEGORY_FORM">
+                    <form onSubmit={updateCategory}>
 
                         <ul className="nav nav-tabs" id="myTab" role="tablist">
                             <li className="nav-item" role="presentation">
@@ -99,17 +90,18 @@ function Category() {
                                 <div className="form-group mb-3">
                                     <label>Slug</label>
                                     <input type="text" name="slug" onChange={handleInput} value={categoryInput.slug} className="form-control" />
-                                    <span>{categoryInput.error_list.slug}</span>
+                                    <small className='text-danger'>{error.slug}</small>
                                 </div>
 
                                 <div className="form-group mb-3">
                                     <label>Name</label>
                                     <input type="text" name="name" onChange={handleInput} value={categoryInput.name} className="form-control" />
+                                    <small className='text-danger'>{error.name}</small>
                                 </div>
 
                                 <div className="form-group mb-3">
                                     <label>Description</label>
-                                    <textarea name="descrip" onChange={handleInput} value={categoryInput.descrip} className="form-control" />
+                                    <textarea name="description" onChange={handleInput} value={categoryInput.description} className="form-control" />
                                 </div>
 
                                 <div className="form-group mb-3">
@@ -123,6 +115,7 @@ function Category() {
                                 <div className="form-group mb-3">
                                     <label>Meta Title</label>
                                     <input type="text" name="meta_title" onChange={handleInput} value={categoryInput.meta_title} className="form-control" />
+                                    <small className='text-danger'>{error.meta_title}</small>
                                 </div>
 
                                 <div className="form-group mb-3">
@@ -139,18 +132,15 @@ function Category() {
 
                         </div>
 
-                        <button type="submit" className="btn btn-primary px-4 float-end">Submit</button>
+                        <button type="submit" className="btn btn-primary px-4 float-end">Update</button>
 
                     </form>
 
                 </div>
             </div>
+
         </div>
-
-
-
-
     )
 }
 
-export default Category;
+export default EditCategory;
