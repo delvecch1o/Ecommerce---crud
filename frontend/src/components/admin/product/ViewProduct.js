@@ -31,7 +31,14 @@ function ViewProduct() {
 
     } else {
 
+        var ProdStatus = '';
         display_Productdata = viewProduct.map((item) => {
+            if(item.status == '0') {
+                ProdStatus = 'Shown';
+
+            } else if(item.status == '1'){
+                ProdStatus = 'Hidden';
+            }
 
             return (
                 <tr key={item.id}>
@@ -43,7 +50,9 @@ function ViewProduct() {
                     <td>
                         <Link to={`edit-product/${item.id}`} className='btn btn-success btn-sm'>Edit</Link>
                     </td>
-                    <td><button type="button" className='btn btn-danger btn-sm'>Delete</button></td>
+                    <td>
+                        {ProdStatus}
+                    </td>
                 </tr>
             )
         });
@@ -69,7 +78,7 @@ function ViewProduct() {
                                 <th>Selling Price</th>
                                 <th>Image</th>
                                 <th>Edit</th>
-                                <th>Delete</th>
+                                <th>Status</th>
                             </tr>
                         </thead>
                         <tbody>

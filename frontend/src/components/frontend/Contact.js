@@ -1,14 +1,14 @@
 import React from "react";
 
-function Home() {
+function Contact() {
     return(
      <div>
          
-         <h1>Home Page</h1>
+         <h1>Tela de Contact</h1>
      </div>
       
         
     )
 }
 
-export default Home;
+export default Contact;

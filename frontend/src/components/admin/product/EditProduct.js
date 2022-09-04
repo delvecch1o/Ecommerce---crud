@@ -23,9 +23,7 @@ function EditProduct(props) {
         original_price: '',
         qty: '',
         brand: '',
-        featured: '',
-        popular: '',
-        status: '',
+        
 
     });
 
@@ -38,9 +36,18 @@ function EditProduct(props) {
         setProduct({ ...productInput, [e.target.name]: e.target.value });
     }
 
+
     const handleImage = (e) => {
         setPicture({ image: e.target.files[0] });
     }
+    
+    const [allcheckbox, setChechboxes ] = useState([]);
+    const handleCheckbox = (e) => {
+        e.persist();
+        setChechboxes({ ...allcheckbox, [e.target.name]: e.target.checked });
+    }
+
+    
 
 
     useEffect(() => {
@@ -54,8 +61,10 @@ function EditProduct(props) {
         const product_id = props.match.params.id
         axios.get(`/api/edit-product/${product_id}`).then(res => {
             if(res.data.status === 200){
-                
+
+                // console.log(res.data.product);
                 setProduct(res.data.product);
+                setChechboxes(res.data.product);
             } 
             else if(res.data.status === 404){
                 swal("Error", res.data.message, "error")
@@ -87,9 +96,9 @@ function EditProduct(props) {
         formData.append('original_price', productInput.original_price);
         formData.append('qty', productInput.qty);
         formData.append('brand', productInput.brand);
-        formData.append('featured', productInput.featured);
-        formData.append('popular', productInput.popular);
-        formData.append('status', productInput.status);
+        formData.append('featured', allcheckbox.featured ? '1' : '0' );
+        formData.append('popular', allcheckbox.popular ? '1' : '0' );
+        formData.append('status', allcheckbox.status ? '1' : '0' );
 
         axios.post(`/api/update-product/${product_id}`, formData).then(res => {
 
@@ -98,6 +107,7 @@ function EditProduct(props) {
                 
 
                swal("Success",res.data.message, "success");
+               console.log(allcheckbox);
                setError([]);
 
             }
@@ -242,23 +252,23 @@ function EditProduct(props) {
                                     <div className="col-md-8 form-group mb-3">
                                         <label>Image</label>
                                         <input type="file" name="image" onChange={handleImage} className="form-control" />
-                                        <img src={`http://localhost:8000/${productInput.image}`} width="50px" alt="" ></img>
+                                        <img src={`http://localhost:8000/${productInput.image}`} width="50px" alt={productInput.name} ></img>
                                         <small className="text-danger">{errorlist.image}</small>
                                     </div>
 
                                     <div className="col-md-4 form-group mb-3">
                                         <label>Featured (checked=show)</label>
-                                        <input type="checkbox" name="featured" onChange={handleInput} value={productInput.featured} className="w-50 h-50" />
+                                        <input type="checkbox" name="featured" onChange={handleCheckbox} defaultChecked={allcheckbox.featured === 1 ? true:false} className="w-50 h-50" />
                                     </div>
 
                                     <div className="col-md-4 form-group mb-3">
                                         <label>Popular (checked=show)</label>
-                                        <input type="checkbox" name="popular" onChange={handleInput} value={productInput.popular} className="w-50 h-50" />
+                                        <input type="checkbox" name="popular" onChange={handleCheckbox} defaultChecked={allcheckbox.popular === 1 ? true:false} className="w-50 h-50" />
                                     </div>
 
                                     <div className="col-md-4 form-group mb-3">
                                         <label>Status (checked=Hidden)</label>
-                                        <input type="checkbox" name="status" onChange={handleInput} value={productInput.status} className="w-50 h-50" />
+                                        <input type="checkbox" name="status" onChange={handleCheckbox} defaultChecked={allcheckbox.status === 1 ? true:false} className="w-50 h-50" />
                                     </div>
 
 
