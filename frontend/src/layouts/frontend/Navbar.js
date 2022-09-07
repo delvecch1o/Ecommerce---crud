@@ -80,18 +80,11 @@ function Navbar() {
             <li className="nav-item">
               <Link className="nav-link active" to="/collections">Collection</Link>
             </li>
-
+           
             <li className="nav-item">
-              <Link className="nav-link active" to="/login">Login</Link>
+              <Link className="nav-link active" to="/cart">Cart</Link>
             </li>
 
-            <li className="nav-item">
-              <Link className="nav-link active" to="/register">Register</Link>
-            </li>
-
-            <li className="nav-item">
-              <Link className="nav-link" to="#">Collection</Link>
-            </li>
             {AuthButtons}
 
           </ul>
